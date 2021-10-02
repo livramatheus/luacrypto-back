@@ -311,13 +311,7 @@ function getCotacaoIntervalo(dias) {
                 )
                 AND cotacao_moeda.moeda = ?
                 ORDER BY
-<<<<<<< HEAD
                     1 ASC;`;
-=======
-                    cotacao_moeda.data_hora DESC
-                LIMIT
-                    ${dias};`;
->>>>>>> e441af6777c61c5fd94b4d965890ce35d76d5355
 }
 
 function getCotacaoSemanal(simbolo) {
