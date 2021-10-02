@@ -1,12 +1,4 @@
-const mysql = require('mysql');
-const db = mysql.createPool(
-    {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME
-    }
-);
+const db = require("../config/db");
 
 const getMoedasAtivas = () => {
     return ["0x", "1inch", "aave", "algorand", "alpha-finance", "amp-token", "ankr", "aragon", "ardor", "arweave", "audius", "augur", "avalanche-2", "axie-infinity", "badger-dao", "bakerytoken", "balancer", "bancor", "band-protocol", "basic-attention-token", "binancecoin", "bitcoin", "bitcoin-bep2", "bitcoin-cash", "bitcoin-cash-sv", "bitcoin-diamond", "bitcoin-gold", "bitshares", "bittorrent-2", "blockstack", "bora", "btc-standard-hashrate-token", "cardano", "cartesi", "celer-network", "celo", "celsius-degree-token", "chainlink", "chiliz", "civic", "compound-governance-token", "conflux-token", "constellation-labs", "cosmos", "coti", "crypto-com-chain", "curve-dao-token", "dash", "decentraland", "decred", "dent", "digibyte", "dodo", "dogecoin", "elrond-erd-2", "energy-web-token", "enjincoin", "eos", "ergo", "ethereum", "ethereum-classic", "ethos", "fantom", "fetch-ai", "filecoin", "flow", "ftx-token", "funfair", "gatechain-token", "gemini-dollar", "gnosis", "golem", "harmony", "havven", "hedera-hashgraph", "helium", "hive", "holotoken", "huobi-token", "husd", "icon", "iexec-rlc", "injective-protocol", "internet-computer", "iostoken", "iota", "iotex", "kava", "kin", "klay-token", "kucoin-shares", "kusama", "leo-token", "lisk", "litecoin", "livepeer", "loopring", "maidsafecoin", "maker", "mass-vehicle-ledger", "matic-network", "mdex", "medibloc", "metal", "mina-protocol", "monero", "my-neighbor-alice", "nano", "near", "nem", "neo", "nervos-network", "nexo", "nkn", "nucypher", "numeraire", "ocean-protocol", "okb", "omisego", "ong", "ontology", "orbs", "orchid-protocol", "origin-protocol", "pancakeswap-token", "pax-gold", "perpetual-protocol", "pha", "polkadot", "polymath", "prometeus", "qtum", "quant-network", "ravencoin", "reef-finance", "renbtc", "republic-protocol", "request-network", "reserve-rights-token", "revain", "rif-token", "ripple", "serum", "shiba-inu", "singularitynet", "skale", "smooth-love-potion", "solana", "status", "steem", "stellar", "storj", "storm", "stratis", "strike", "sushi", "swipe", "swissborg", "telcoin", "terra-luna", "tezos", "the-graph", "the-sandbox", "theta-fuel", "theta-token", "thorchain", "tomochain", "tron", "ultra", "uma", "unibright", "uniswap", "uquid-coin", "utrust", "vechain", "venus", "verge", "vethor-token", "waves", "wax", "wazirx", "wink", "wrapped-bitcoin", "xdce-crowd-sale", "yearn-finance", "zcash", "zencash", "zilliqa", "binance-usd", "dai", "fei-protocol", "neutrino", "paxos-standard", "terrausd", "tether", "true-usd", "usd-coin"];
@@ -310,7 +302,7 @@ function getCotacaoIntervalo(dias) {
                     )
                     AND cotacao_moeda.moeda = ?
                 ORDER BY
-                    cotacao_moeda.data_hora ASC
+                    cotacao_moeda.data_hora DESC
                 LIMIT
                     ${dias};`;
 }
@@ -382,7 +374,7 @@ function getCotacaoDiaria(chave) {
                    WHERE moeda = ?
                      AND data_hora > (NOW() - INTERVAL 1 DAY)
                 GROUP BY sec_to_time(time_to_sec(data_hora) - time_to_sec(data_hora) %(5 * 60))
-                ORDER BY data_hora ASC;`;
+                ORDER BY data_hora DESC;`;
 
     let params = chave.toLowerCase();
 
