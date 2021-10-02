@@ -266,7 +266,9 @@ const getCotacaoIntervalo = (dias) => {
                                                       GROUP BY DATE(cotacao_etf.data_hora)              
                                                       ORDER BY cotacao_etf.data_hora DESC
                                                       LIMIT ${dias}) TEMP_TAB)
-                AND cotacao_etf.simbolo = ? ORDER BY data_hora ASC;`;
+                AND cotacao_etf.simbolo = ?
+              ORDER BY data_hora ASC;`;
+                
 }
 
 module.exports = {

@@ -293,26 +293,33 @@ function getUltimaCotacaoBancoReduzida(simbolos) {
 
 function getCotacaoIntervalo(dias) {
     return `SELECT
-                    cotacao_moeda.data_hora,
-                    cotacao_moeda.preco_atual
+                cotacao_moeda.data_hora,
+                cotacao_moeda.preco_atual
+            FROM
+                cotacao_moeda
+            WHERE
+                cotacao_moeda.data_hora IN (
+                SELECT
+                    *
                 FROM
-                    cotacao_moeda
-                WHERE
-                    cotacao_moeda.data_hora IN (
-                        SELECT
-                            MAX(cotacao_moeda_ss.data_hora)
-                        FROM
-                            cotacao_moeda cotacao_moeda_ss
-                        WHERE
-                            cotacao_moeda.moeda = cotacao_moeda_ss.moeda
-                        GROUP BY
-                            DATE(cotacao_moeda_ss.data_hora)
-                    )
-                    AND cotacao_moeda.moeda = ?
+                    (
+                    SELECT
+                        MAX(cotacao_moeda_ss.data_hora)
+                    FROM
+                        cotacao_moeda cotacao_moeda_ss
+                    WHERE
+                        cotacao_moeda_ss.moeda = ?
+                    GROUP BY
+                        DATE(cotacao_moeda_ss.data_hora)
+                    ORDER BY
+                        1 DESC
+                    LIMIT
+                        ${dias}
+                    ) TEMP_TABLE
+                )
+                AND cotacao_moeda.moeda = ?
                 ORDER BY
-                    cotacao_moeda.data_hora ASC
-                LIMIT
-                    ${dias};`;
+                    1 ASC;`;
 }
 
 function getCotacaoSemanal(simbolo) {
@@ -324,7 +331,7 @@ function getCotacaoSemanal(simbolo) {
         db.query({
             sql: select,
             timeout: 10000,
-            values: params
+            values: [params, params]
         }, function (error, results, fields) {
             if (error) {
                 console.log('❌ Erro ao resgatar a cotação semanal de uma moeda ' + error.message);
@@ -344,7 +351,7 @@ function getCotacaoMensal(simbolo) {
         db.query({
             sql: select,
             timeout: 10000,
-            values: params
+            values: [params, params]
         }, function (error, results, fields) {
             if (error) {
                 console.log('❌ Erro ao resgatar a cotação mensal de uma moeda ' + error.message);
@@ -364,7 +371,7 @@ function getCotacaoAnual(simbolo) {
         db.query({
             sql: select,
             timeout: 10000,
-            values: params
+            values: [params, params]
         }, function (error, results, fields) {
             if (error) {
                 console.log('❌ Erro ao resgatar a cotação anual de uma moeda ' + error.message);
