@@ -381,7 +381,7 @@ function getCotacaoDiaria(chave) {
                    WHERE moeda = ?
                      AND data_hora > (NOW() - INTERVAL 1 DAY)
                 GROUP BY sec_to_time(time_to_sec(data_hora) - time_to_sec(data_hora) %(5 * 60))
-                ORDER BY data_hora DESC;`;
+                ORDER BY data_hora ASC;`;
 
     let params = chave.toLowerCase();
 
