@@ -4,7 +4,10 @@ const abreviacoesMeses = [
 ];
 
 exports.isMercadoAberto = (data = new Date()) => {
-    return ![0, 6].includes(data.getDay());
+    return (
+        [1, 2, 3, 4, 5].includes(data.getDay()) &&
+        (data.getHours() >= 13 && data.getHours() < 20)
+    )
 };
 
 exports.formataExtenso = (data = new Date()) => {

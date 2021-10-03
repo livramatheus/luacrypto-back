@@ -122,95 +122,98 @@ function getCotacaoAnual(simbolo) {
 
 function getUltimaCotacaoBancoEtf(simbolo) {
     let selectLastCotacao = `SELECT
-    *,
-    (
-        (
-            (
-                cotacao_etf.preco_atual - (
-                    SELECT
-                        x.preco_atual
-                    FROM
-                        cotacao_etf x
-                    WHERE
-                        cotacao_etf.simbolo = x.simbolo
-                        AND x.data_hora = (
-                            SELECT
-                                MAX(cotacao_etf.data_hora)
-                            FROM
-                                cotacao_etf
-                            WHERE
-                                DATE(cotacao_etf.data_hora) = (
+                                    *,
+                                    (
+                                    (
+                                        (
+                                        cotacao_etf.preco_atual - (
+                                            SELECT
+                                            x.preco_atual
+                                            FROM
+                                            cotacao_etf x
+                                            WHERE
+                                            cotacao_etf.simbolo = x.simbolo
+                                            AND x.data_hora = (
+                                                SELECT
+                                                MAX(y.data_hora)
+                                                FROM
+                                                cotacao_etf y
+                                                WHERE
+                                                y.data_hora <= (
+                                                    SELECT
+                                                    DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                                                )
+                                                AND y.simbolo = x.simbolo
+                                            )
+                                        )
+                                        ) / cotacao_etf.preco_atual
+                                    ) * 100
+                                    ) as variacao_24h,
+                                    (
+                                    (
+                                        (
+                                        cotacao_etf.preco_atual - (
+                                            SELECT
+                                            x.preco_atual
+                                            FROM
+                                            cotacao_etf x
+                                            WHERE
+                                            cotacao_etf.simbolo = x.simbolo
+                                            AND x.data_hora = (
+                                                SELECT
+                                                MAX(y.data_hora)
+                                                FROM
+                                                cotacao_etf y
+                                                WHERE
+                                                DATE(y.data_hora) = (
+                                                    SELECT
+                                                    CURRENT_DATE - INTERVAL 7 DAY
+                                                )
+                                                AND y.simbolo = x.simbolo
+                                            )
+                                        )
+                                        ) / cotacao_etf.preco_atual
+                                    ) * 100
+                                    ) as variacao_7d,
+                                    (
+                                    (
+                                        (
+                                        cotacao_etf.preco_atual - (
+                                            SELECT
+                                            x.preco_atual
+                                            FROM
+                                            cotacao_etf x
+                                            WHERE
+                                            cotacao_etf.simbolo = x.simbolo
+                                            AND x.data_hora = (
+                                                SELECT
+                                                MAX(y.data_hora)
+                                                FROM
+                                                cotacao_etf y
+                                                WHERE
+                                                DATE(y.data_hora) = (
+                                                    SELECT
+                                                    CURRENT_DATE - INTERVAL 30 DAY
+                                                )
+                                                AND y.simbolo = x.simbolo
+                                            )
+                                        )
+                                        ) / cotacao_etf.preco_atual
+                                    ) * 100
+                                    ) as variacao_30d
+                                FROM
+                                    etf
+                                    JOIN cotacao_etf ON etf.simbolo = cotacao_etf.simbolo
+                                WHERE
+                                    cotacao_etf.data_hora = (
                                     SELECT
-                                        CURRENT_DATE - INTERVAL 1 DAY
-                                )
-                        )
-                )
-            ) / cotacao_etf.preco_atual
-        ) * 100
-    ) as variacao_24h,
-    (
-        (
-            (
-                cotacao_etf.preco_atual - (
-                    SELECT
-                        x.preco_atual
-                    FROM
-                        cotacao_etf x
-                    WHERE
-                        cotacao_etf.simbolo = x.simbolo
-                        AND x.data_hora = (
-                            SELECT
-                                MAX(cotacao_etf.data_hora)
-                            FROM
-                                cotacao_etf
-                            WHERE
-                                DATE(cotacao_etf.data_hora) = (
-                                    SELECT
-                                        CURRENT_DATE - INTERVAL 7 DAY
-                                )
-                        )
-                )
-            ) / cotacao_etf.preco_atual
-        ) * 100
-    ) as variacao_7d,
-    (
-        (
-            (
-                cotacao_etf.preco_atual - (
-                    SELECT
-                        x.preco_atual
-                    FROM
-                        cotacao_etf x
-                    WHERE
-                        cotacao_etf.simbolo = x.simbolo
-                        AND x.data_hora = (
-                            SELECT
-                                MAX(cotacao_etf.data_hora)
-                            FROM
-                                cotacao_etf
-                            WHERE
-                                DATE(cotacao_etf.data_hora) = (
-                                    SELECT
-                                        CURRENT_DATE - INTERVAL 30 DAY
-                                )
-                        )
-                )
-            ) / cotacao_etf.preco_atual
-        ) * 100
-    ) as variacao_30d
-FROM
-    etf
-    JOIN cotacao_etf ON etf.simbolo = cotacao_etf.simbolo
-WHERE
-    cotacao_etf.data_hora = (
-        SELECT
-            MAX(data_hora)
-        FROM
-            cotacao_etf cotacao_etf_subselect
-        WHERE
-            cotacao_etf.simbolo = cotacao_etf_subselect.simbolo
-    )
-    AND etf.simbolo = ?;`;
+                                        MAX(data_hora)
+                                    FROM
+                                        cotacao_etf cotacao_etf_subselect
+                                    WHERE
+                                        cotacao_etf.simbolo = cotacao_etf_subselect.simbolo
+                                    )
+                                    AND etf.simbolo = ?;`;
 
     let params = simbolo.toUpperCase();
 

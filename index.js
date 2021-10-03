@@ -47,8 +47,8 @@ if (process.env.ENV_TYPE == 2) {
         controllerEtf.atualizarCotacoesEtf();
     });
 
-    // A cada 15 minutos são atualizadas as cotações de FIAT
-    cron.schedule('*/15 * * * *', () => {
+    // A cada 30 minutos são atualizadas as cotações de FIAT
+    cron.schedule('*/30 * * * *', () => {
         controllerFiat.atualizarCotacoesFiat();
     });
 } else {
