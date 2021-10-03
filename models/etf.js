@@ -38,8 +38,18 @@ function getCotacaoDiaria(chave) {
     let select = `SELECT data_hora,
                          preco_atual
                     FROM cotacao_etf
-                   WHERE simbolo = ?
-                     AND data_hora > (NOW() - INTERVAL 1 DAY)
+                    WHERE
+                    cotacao_etf.simbolo = ?
+                    AND DATE(cotacao_etf.data_hora) > (
+                        (
+                          SELECT
+                            DATE(MAX(x.data_hora))
+                          FROM
+                            cotacao_etf x
+                          WHERE
+                            x.simbolo = cotacao_etf.simbolo
+                        ) - INTERVAL 1 DAY
+                      )
                    GROUP BY sec_to_time(time_to_sec(data_hora) - time_to_sec(data_hora) %(5 * 60))
                    ORDER BY data_hora ASC;`;
 
@@ -165,7 +175,7 @@ function getUltimaCotacaoBancoEtf(simbolo) {
                                                 FROM
                                                 cotacao_etf y
                                                 WHERE
-                                                DATE(y.data_hora) = (
+                                                DATE(y.data_hora) <= (
                                                     SELECT
                                                     CURRENT_DATE - INTERVAL 7 DAY
                                                 )
@@ -191,7 +201,7 @@ function getUltimaCotacaoBancoEtf(simbolo) {
                                                 FROM
                                                 cotacao_etf y
                                                 WHERE
-                                                DATE(y.data_hora) = (
+                                                DATE(y.data_hora) <= (
                                                     SELECT
                                                     CURRENT_DATE - INTERVAL 30 DAY
                                                 )
