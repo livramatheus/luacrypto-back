@@ -96,119 +96,122 @@ function insereCotacaoBanco(toInsert) {
 
 function getUltimaCotacaoBanco(simbolo) {
     let selectLastCotacao = `SELECT
-                                    moeda.chave,
-                                    moeda.simbolo,
-                                    moeda.nome,
-                                    moeda.categoria,
-                                    moeda.vende_binance,
-                                    moeda.info,
-                                    moeda.website,
-                                    moeda.subreddit,
-                                    cotacao_moeda.data_hora,
-                                    cotacao_moeda.preco_atual,
-                                    cotacao_moeda.capitalizacao,
-                                    cotacao_moeda.volume_24h,
-                                    mercado_moeda.fornecimento_total,
-                                    mercado_moeda.fornecimento_maximo,
-                                    mercado_moeda.fornecimento_circulante,
+                                moeda.chave,
+                                moeda.simbolo,
+                                moeda.nome,
+                                moeda.categoria,
+                                moeda.vende_binance,
+                                moeda.info,
+                                moeda.website,
+                                moeda.subreddit,
+                                cotacao_moeda.data_hora,
+                                cotacao_moeda.preco_atual,
+                                cotacao_moeda.capitalizacao,
+                                cotacao_moeda.volume_24h,
+                                mercado_moeda.fornecimento_total,
+                                mercado_moeda.fornecimento_maximo,
+                                mercado_moeda.fornecimento_circulante,
+                                (
+                                (
                                     (
-                                        (
-                                            (
-                                                cotacao_moeda.preco_atual - (
-                                                    SELECT
-                                                        x.preco_atual
-                                                    FROM
-                                                        cotacao_moeda x
-                                                    WHERE
-                                                        cotacao_moeda.moeda = x.moeda
-                                                        AND x.data_hora = (
-                                                            SELECT
-                                                                MAX(cotacao_moeda.data_hora)
-                                                            FROM
-                                                                cotacao_moeda
-                                                            WHERE
-                                                                DATE(cotacao_moeda.data_hora) = (
-                                                                    SELECT
-                                                                        CURRENT_DATE - INTERVAL 1 DAY
-                                                                )
-                                                        )
-                                                )
-                                            ) / cotacao_moeda.preco_atual
-                                        ) * 100
-                                    ) as variacao_24h,
-                                    (
-                                        (
-                                            (
-                                                cotacao_moeda.preco_atual - (
-                                                    SELECT
-                                                        x.preco_atual
-                                                    FROM
-                                                        cotacao_moeda x
-                                                    WHERE
-                                                        cotacao_moeda.moeda = x.moeda
-                                                        AND x.data_hora = (
-                                                            SELECT
-                                                                MAX(cotacao_moeda.data_hora)
-                                                            FROM
-                                                                cotacao_moeda
-                                                            WHERE
-                                                                DATE(cotacao_moeda.data_hora) = (
-                                                                    SELECT
-                                                                        CURRENT_DATE - INTERVAL 7 DAY
-                                                                )
-                                                        )
-                                                )
-                                            ) / cotacao_moeda.preco_atual
-                                        ) * 100
-                                    ) as variacao_7d,
-                                    (
-                                        (
-                                            (
-                                                cotacao_moeda.preco_atual - (
-                                                    SELECT
-                                                        x.preco_atual
-                                                    FROM
-                                                        cotacao_moeda x
-                                                    WHERE
-                                                        cotacao_moeda.moeda = x.moeda
-                                                        AND x.data_hora = (
-                                                            SELECT
-                                                                MAX(cotacao_moeda.data_hora)
-                                                            FROM
-                                                                cotacao_moeda
-                                                            WHERE
-                                                                DATE(cotacao_moeda.data_hora) = (
-                                                                    SELECT
-                                                                        CURRENT_DATE - INTERVAL 30 DAY
-                                                                )
-                                                        )
-                                                )
-                                            ) / cotacao_moeda.preco_atual
-                                        ) * 100
-                                    ) as variacao_30d
-                                FROM
-                                    moeda
-                                    JOIN cotacao_moeda ON moeda.chave = cotacao_moeda.moeda
-                                    JOIN mercado_moeda ON moeda.chave = mercado_moeda.moeda
-                                WHERE
-                                    cotacao_moeda.data_hora = (
+                                    cotacao_moeda.preco_atual - (
                                         SELECT
-                                            MAX(data_hora)
+                                        x.preco_atual
                                         FROM
-                                            cotacao_moeda cotacao_moeda_ss
+                                        cotacao_moeda x
                                         WHERE
-                                            cotacao_moeda.moeda = cotacao_moeda_ss.moeda
+                                        cotacao_moeda.moeda = x.moeda
+                                        AND x.data_hora = (
+                                            SELECT
+                                            MAX(y.data_hora)
+                                            FROM
+                                            cotacao_moeda y
+                                            WHERE
+                                            y.data_hora <= (
+                                                SELECT
+                                                DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                                            )
+                                            AND y.moeda = x.moeda
+                                        )
                                     )
-                                    AND moeda.ativo = true
-                                    AND moeda.chave = ?
-                                    AND mercado_moeda.dia = (
+                                    ) / cotacao_moeda.preco_atual
+                                ) * 100
+                                ) as variacao_24h,
+                                (
+                                (
+                                    (
+                                    cotacao_moeda.preco_atual - (
                                         SELECT
-                                            MAX(dia)
+                                        x.preco_atual
                                         FROM
-                                            mercado_moeda mercado_moeda_ss
+                                        cotacao_moeda x
                                         WHERE
-                                            mercado_moeda_ss.moeda = moeda.chave
-                                    );`;
+                                        cotacao_moeda.moeda = x.moeda
+                                        AND x.data_hora = (
+                                            SELECT
+                                            MAX(y.data_hora)
+                                            FROM
+                                            cotacao_moeda y
+                                            WHERE
+                                            DATE(y.data_hora) = (
+                                                SELECT
+                                                CURRENT_DATE - INTERVAL 7 DAY
+                                            )
+                                            AND y.moeda = x.moeda
+                                        )
+                                    )
+                                    ) / cotacao_moeda.preco_atual
+                                ) * 100
+                                ) as variacao_7d,
+                                (
+                                (
+                                    (
+                                    cotacao_moeda.preco_atual - (
+                                        SELECT
+                                        x.preco_atual
+                                        FROM
+                                        cotacao_moeda x
+                                        WHERE
+                                        cotacao_moeda.moeda = x.moeda
+                                        AND x.data_hora = (
+                                            SELECT
+                                            MAX(y.data_hora)
+                                            FROM
+                                            cotacao_moeda y
+                                            WHERE
+                                            DATE(y.data_hora) = (
+                                                SELECT
+                                                CURRENT_DATE - INTERVAL 30 DAY
+                                            )
+                                                AND y.moeda = x.moeda
+                                        )
+                                    )
+                                    ) / cotacao_moeda.preco_atual
+                                ) * 100
+                                ) as variacao_30d
+                            FROM
+                                moeda
+                                JOIN cotacao_moeda ON moeda.chave = cotacao_moeda.moeda
+                                JOIN mercado_moeda ON moeda.chave = mercado_moeda.moeda
+                            WHERE
+                                cotacao_moeda.data_hora = (
+                                SELECT
+                                    MAX(data_hora)
+                                FROM
+                                    cotacao_moeda cotacao_moeda_ss
+                                WHERE
+                                    cotacao_moeda.moeda = cotacao_moeda_ss.moeda
+                                )
+                                AND moeda.ativo = true
+                                AND moeda.chave = ?
+                                AND mercado_moeda.dia = (
+                                SELECT
+                                    MAX(dia)
+                                FROM
+                                    mercado_moeda mercado_moeda_ss
+                                WHERE
+                                    mercado_moeda_ss.moeda = moeda.chave
+                                );`;
 
     let params = simbolo.toUpperCase();
 

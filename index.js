@@ -57,5 +57,5 @@ app.use(MedoGanancia);
 app.use(Post);
 
 app.listen(process.env.PORT, () => {
-    console.log("Servidor iniciado com sucesso!");
+    console.log("Servidor iniciado com sucesso - ", process.env.NODE_ENV);
 });
