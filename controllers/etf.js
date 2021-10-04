@@ -57,17 +57,22 @@ const getDadosGeraisRecentes = (simbolo) => {
  */
 const atualizarCotacoesEtf = () => {
     if (AuxiliarDias.isMercadoAberto()) {
-        modelEtf.getEtfsAtivas().forEach((simbolo) => {
-    
-            let url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey=${process.env.API_ALPHA}&symbol=${simbolo}.SA`;
-    
-            Axios.get(url).then((resposta) => {
-                let etfRetorno = resposta.data['Global Quote'];
-                modelEtf.insereCotacaoBancoEtf([getRegistroTratadoEtf(etfRetorno)]);
-                console.log('✔ ETF atualizada com sucesso!', new Date().toLocaleString());
-            }).catch((erro) => {
-                console.log('❌ Erro ao atualizar ETF', new Date().toLocaleString(), erro.message);
-            });
+        var delayInMilliseconds = 5000;
+
+        modelEtf.getEtfsAtivas().forEach((simbolo, index) => {
+            
+            
+            setTimeout(function () {
+                let url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey=${process.env.API_ALPHA}&symbol=${simbolo}.SA`;
+                
+                Axios.get(url).then((resposta) => {
+                    let etfRetorno = resposta.data['Global Quote'];
+                    modelEtf.insereCotacaoBancoEtf([getRegistroTratadoEtf(etfRetorno)]);
+                    console.log('✔ ETF atualizada com sucesso!', new Date().toLocaleString());
+                }).catch((erro) => {
+                    console.log('❌ Erro ao atualizar ETF', new Date().toLocaleString(), erro.message);
+                });
+            }, delayInMilliseconds * (index + 1));
         });
     } else {
         console.log('🔒 Mercado fechado! ETFs não foram atualizadas!', new Date().toLocaleString());
