@@ -56,12 +56,10 @@ const getDadosGeraisRecentes = (simbolo) => {
  * Esse método é chamado pelo agendamento
  */
 const atualizarCotacoesEtf = () => {
-    if (AuxiliarDias.isMercadoAberto()) {
+    // if (AuxiliarDias.isMercadoAberto()) {
         var delayInMilliseconds = 5000;
 
         modelEtf.getEtfsAtivas().forEach((simbolo, index) => {
-            
-            
             setTimeout(function () {
                 let url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey=${process.env.API_ALPHA}&symbol=${simbolo}.SA`;
                 
@@ -74,9 +72,9 @@ const atualizarCotacoesEtf = () => {
                 });
             }, delayInMilliseconds * (index + 1));
         });
-    } else {
-        console.log('🔒 Mercado fechado! ETFs não foram atualizadas!', new Date().toLocaleString());
-    }
+    // } else {
+        // console.log('🔒 Mercado fechado! ETFs não foram atualizadas!', new Date().toLocaleString());
+    // }
 }
 
 const getRegistroTratadoEtf = (objEtf) => {

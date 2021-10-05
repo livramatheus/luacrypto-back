@@ -19,7 +19,7 @@ const controllerMedoGanancia = require('./controllers/medoganancia');
 const app = express();
 app.use(cors());
 
-if (process.env.ENV_TYPE == 2) {
+if (true) {
     console.log('👍 Iniciando agendamentos.');
 
     // Todo dia à 3:10 da manhã são atualizados os dados de dominância
@@ -33,7 +33,7 @@ if (process.env.ENV_TYPE == 2) {
     });
 
     // Todo dia às 3:12 da manhã são atualizados os dados de medo e ganância
-    cron.schedule('11 3 * * *', () => {
+    cron.schedule('12 3 * * *', () => {
         controllerMedoGanancia.atualizarDadosMedoGanancia();
     });
 
@@ -42,8 +42,10 @@ if (process.env.ENV_TYPE == 2) {
         controllerMoeda.atualizarCotacoesMoeda();
     });
 
-    // A cada 14 minutos são atualziadas as cotações das etfs
-    cron.schedule('*/14 * * * *', () => {
+    // Todo dia às 20:01 são atualizadas as ETFs
+    // Enquanto eu não encontrar um fornecedor novo, somente
+    // Terão dados diários
+    cron.schedule('1 20 * * *', () => {
         controllerEtf.atualizarCotacoesEtf();
     });
 
