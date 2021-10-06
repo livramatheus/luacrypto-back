@@ -132,6 +132,14 @@ const pesquisarMoeda = (simbolos) => {
     })
 }
 
+const getMoedasDestaque = () => {
+    return new Promise((resolve, reject) => {
+        modelMoeda.getMoedasDestaque().then((resultado) => {
+            resolve(resultado);
+        });
+    })
+}
+
 module.exports = {
     atualizarCotacoesMoeda,
     atualizarDadosMercadoMoeda,
@@ -141,5 +149,6 @@ module.exports = {
     getCotacaoAnual,
     getUltimaCotacaoBanco,
     getUltimaCotacaoBancoReduzida,
-    pesquisarMoeda
+    pesquisarMoeda,
+    getMoedasDestaque
 }

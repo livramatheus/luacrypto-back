@@ -83,4 +83,11 @@ router.get('/todasmoedasreduzidas', (req, res) => {
     });
 });
 
+// Retorna 5 moedas em destaque que não são fiat
+router.get('/moedaemdestaque', (req, res) => {
+    controllerMoeda.getMoedasDestaque().then((resultadoPromise) => {
+        res.send(resultadoPromise);
+    });
+});
+
 module.exports = router;

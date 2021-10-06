@@ -19,7 +19,7 @@ const controllerMedoGanancia = require('./controllers/medoganancia');
 const app = express();
 app.use(cors());
 
-if (true) {
+if (process.env.ENV_TYPE == 2) {
     console.log('👍 Iniciando agendamentos.');
 
     // Todo dia à 3:10 da manhã são atualizados os dados de dominância

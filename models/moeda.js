@@ -230,44 +230,113 @@ function getUltimaCotacaoBanco(simbolo) {
     })
 }
 
+function getMoedasDestaque() {
+    let selectDestaque = `SELECT
+                                moeda.chave,
+                                moeda.simbolo,
+                                moeda.nome,
+                                cotacao_moeda.preco_atual,
+                                (
+                                (
+                                    (
+                                    cotacao_moeda.preco_atual - (
+                                        SELECT
+                                        x.preco_atual
+                                        FROM
+                                        cotacao_moeda x
+                                        WHERE
+                                        cotacao_moeda.moeda = x.moeda
+                                        AND x.data_hora = (
+                                            SELECT
+                                            MAX(y.data_hora)
+                                            FROM
+                                            cotacao_moeda y
+                                            WHERE
+                                            DATE(y.data_hora) = (
+                                                SELECT
+                                                CURRENT_DATE - INTERVAL 1 DAY
+                                            )
+                                            AND x.moeda = y.moeda
+                                        )
+                                    )
+                                    ) / cotacao_moeda.preco_atual
+                                ) * 100
+                                ) as variacao_24h
+                            FROM
+                                moeda
+                                JOIN cotacao_moeda ON moeda.chave = cotacao_moeda.moeda
+                            WHERE
+                                cotacao_moeda.data_hora = (
+                                SELECT
+                                    MAX(ss_cotacao_moeda.data_hora)
+                                FROM
+                                    cotacao_moeda ss_cotacao_moeda
+                                )
+                                AND moeda.ativo = true
+                                ORDER BY variacao_24h DESC
+                            LIMIT
+                                5;`;
+
+    return new Promise((resolve, reject) => {
+        db.query({
+            sql: selectDestaque,
+            timeout: 10000
+        }, function (error, results, fields) {
+            if (error) {
+                console.log('❌ Erro ao resgatar as moedas em destaque ' + error.message);
+            }
+
+            resolve(results);
+        })
+    })
+}
+
 function getUltimaCotacaoBancoReduzida(simbolos) {
-    let selectLastCotacao = `SELECT moeda.chave,
+    let selectLastCotacao = `SELECT
+                                    moeda.chave,
                                     moeda.simbolo,
                                     moeda.nome,
                                     cotacao_moeda.preco_atual,
                                     (
+                                    (
                                         (
-                                            (
-                                                cotacao_moeda.preco_atual - (
+                                        cotacao_moeda.preco_atual - (
+                                            SELECT
+                                            x.preco_atual
+                                            FROM
+                                            cotacao_moeda x
+                                            WHERE
+                                            cotacao_moeda.moeda = x.moeda
+                                            AND x.data_hora = (
+                                                SELECT
+                                                MAX(y.data_hora)
+                                                FROM
+                                                cotacao_moeda y
+                                                WHERE
+                                                DATE(y.data_hora) = (
                                                     SELECT
-                                                        x.preco_atual
-                                                    FROM
-                                                        cotacao_moeda x
-                                                    WHERE
-                                                        cotacao_moeda.moeda = x.moeda
-                                                        AND x.data_hora = (
-                                                            SELECT
-                                                                MAX(cotacao_moeda.data_hora)
-                                                            FROM
-                                                                cotacao_moeda
-                                                            WHERE
-                                                                DATE(cotacao_moeda.data_hora) = (
-                                                                    SELECT
-                                                                        CURRENT_DATE - INTERVAL 1 DAY
-                                                                )
-                                                        )
+                                                    CURRENT_DATE - INTERVAL 1 DAY
                                                 )
-                                            ) / cotacao_moeda.preco_atual
-                                        ) * 100
+                                                AND x.moeda = y.moeda
+                                            )
+                                        )
+                                        ) / cotacao_moeda.preco_atual
+                                    ) * 100
                                     ) as variacao_24h
-                                FROM moeda
-                                JOIN cotacao_moeda ON
-                                    moeda.chave = cotacao_moeda.moeda
-                                WHERE moeda.chave IN (?)
-                                AND cotacao_moeda.data_hora = (SELECT MAX(ss_cotacao_moeda.data_hora)
-                                                                FROM cotacao_moeda ss_cotacao_moeda)
-                                AND moeda.ativo = true
-                                LIMIT 9;`;
+                                FROM
+                                    moeda
+                                    JOIN cotacao_moeda ON moeda.chave = cotacao_moeda.moeda
+                                WHERE
+                                    moeda.chave IN (?)
+                                    AND cotacao_moeda.data_hora = (
+                                    SELECT
+                                        MAX(ss_cotacao_moeda.data_hora)
+                                    FROM
+                                        cotacao_moeda ss_cotacao_moeda
+                                    )
+                                    AND moeda.ativo = true
+                                LIMIT
+                                    9;`;
 
     let params = simbolos;
 
@@ -415,5 +484,6 @@ module.exports = {
     cadastrarMoeda,
     pesquisarMoeda,
     insereDadosMercadoMoeda,
-    getMoedasAtivas
+    getMoedasAtivas,
+    getMoedasDestaque
 };
