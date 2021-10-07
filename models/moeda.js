@@ -280,7 +280,7 @@ function getMoedasDestaque() {
     return new Promise((resolve, reject) => {
         db.query({
             sql: selectDestaque,
-            timeout: 10000
+            timeout: 25000
         }, function (error, results, fields) {
             if (error) {
                 console.log('❌ Erro ao resgatar as moedas em destaque ' + error.message);
@@ -343,7 +343,7 @@ function getUltimaCotacaoBancoReduzida(simbolos) {
     return new Promise((resolve, reject) => {
         db.query({
             sql: selectLastCotacao,
-            timeout: 10000,
+            timeout: 25000,
             values: [params]
         }, function (error, results, fields) {
             if (error) {
