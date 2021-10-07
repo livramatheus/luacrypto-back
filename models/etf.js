@@ -7,6 +7,7 @@ const getEtfsAtivas = () => {
 function getUltimaCotacaoBancoReduzidaEtf() {
     let selectLastCotacao = `SELECT etf.simbolo,
                                     etf.nome,
+                                    cotacao_etf.data_hora,
                                     cotacao_etf.abertura,
                                     cotacao_etf.alta,
                                     cotacao_etf.baixa,
