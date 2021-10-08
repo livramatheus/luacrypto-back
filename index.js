@@ -20,9 +20,10 @@ const app = express();
 if (process.env.ENV_TYPE == 2) {
     console.log('Inicou como produção.');
 
-    app.use(cors({
-        origin: 'https://luacrypto.com'
-    }));
+    // app.use(cors({
+    //     origin: 'https://luacrypto.com'
+    // }));
+    app.use(cors());
 } else {
     console.log('Inicou como desenvolvimento.');
     app.use(cors());
