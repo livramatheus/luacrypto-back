@@ -21,7 +21,7 @@ if (process.env.ENV_TYPE == 2) {
     console.log('Inicou como produção.');
 
     app.use(cors({
-        origin: 'https://luacrypto.herokuapp.com'
+        origin: 'https://luacrypto.com'
     }));
 } else {
     console.log('Inicou como desenvolvimento.');
