@@ -2,3 +2,4 @@
 .env
 dev.js
 ./controllers/dev.js
+teste.sql

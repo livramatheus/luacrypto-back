@@ -238,44 +238,44 @@ function getMoedasDestaque() {
                                 cotacao_moeda.preco_atual,
                                 (
                                 (
-                                    (
                                     cotacao_moeda.preco_atual - (
-                                        SELECT
-                                        x.preco_atual
-                                        FROM
+                                    SELECT
+                                        preco_atual
+                                    FROM
                                         cotacao_moeda x
-                                        WHERE
-                                        cotacao_moeda.moeda = x.moeda
-                                        AND x.data_hora = (
-                                            SELECT
-                                            MAX(y.data_hora)
-                                            FROM
-                                            cotacao_moeda y
-                                            WHERE
-                                            DATE(y.data_hora) = (
-                                                SELECT
-                                                CURRENT_DATE - INTERVAL 1 DAY
-                                            )
-                                            AND x.moeda = y.moeda
+                                    WHERE
+                                        x.data_hora >= (
+                                        SELECT
+                                            DATE_SUB(NOW(), INTERVAL 24 HOUR)
                                         )
+                                        AND x.moeda = moeda.chave
+                                    GROUP BY
+                                        x.moeda
                                     )
-                                    ) / cotacao_moeda.preco_atual
-                                ) * 100
-                                ) as variacao_24h
+                                ) / cotacao_moeda.preco_atual * 100
+                                ) variacao_24h
                             FROM
                                 moeda
                                 JOIN cotacao_moeda ON moeda.chave = cotacao_moeda.moeda
                             WHERE
                                 cotacao_moeda.data_hora = (
                                 SELECT
-                                    MAX(ss_cotacao_moeda.data_hora)
+                                    MAX(ss.data_hora)
                                 FROM
-                                    cotacao_moeda ss_cotacao_moeda
+                                    cotacao_moeda ss
+                                WHERE
+                                    ss.moeda = moeda.chave
+                                    AND ss.data_hora >= (
+                                    SELECT
+                                        DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                                    )
                                 )
-                                AND moeda.ativo = true
-                                ORDER BY variacao_24h DESC
+                            GROUP BY
+                                moeda.chave
+                            ORDER BY
+                                variacao_24h DESC
                             LIMIT
-                                5;`;
+                                5`;
 
     return new Promise((resolve, reject) => {
         db.query({
