@@ -17,7 +17,16 @@ const controllerMoeda        = require('./controllers/moeda');
 const controllerMedoGanancia = require('./controllers/medoganancia');
 
 const app = express();
-app.use(cors());
+if (process.env.ENV_TYPE == 2) {
+    console.log('Inicou como produção.');
+
+    app.use(cors({
+        origin: 'https://www.luacrypto.com/'
+    }));
+} else {
+    console.log('Inicou como desenvolvimento.');
+    app.use(cors());
+}
 
 if (process.env.ENV_TYPE == 2) {
     console.log('👍 Iniciando agendamentos.');
