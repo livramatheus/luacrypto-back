@@ -20,7 +20,7 @@ const cors = require('cors');
 
 app.use(
     cors({
-        origin: ['https://luacrypto.netlify.app/', 'https://www.luacrypto.com/']
+        origin: ['https://luacrypto.netlify.app', 'https://www.luacrypto.com']
     })
 )
 
