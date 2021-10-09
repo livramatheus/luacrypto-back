@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+const corsMiddleware = require('./cors/cors');
 const cron = require('node-cron');
 
 const Fiat = require('./routes/fiat');
@@ -17,13 +17,12 @@ const controllerMoeda        = require('./controllers/moeda');
 const controllerMedoGanancia = require('./controllers/medoganancia');
 
 const app = express();
+app.use(corsMiddleware);
+
 if (process.env.ENV_TYPE == 2) {
     console.log('Inicou como produção.');
-
-    app.use(cors());
 } else {
     console.log('Inicou como desenvolvimento.');
-    app.use(cors());
 }
 
 if (process.env.ENV_TYPE == 2) {
