@@ -3,12 +3,12 @@ const express = require('express');
 const cron = require('node-cron');
 const corsConfig = require('./config/cors');
 
-const Fiat = require('./routes/fiat');
-const Etf = require('./routes/etf');
-const Moeda = require('./routes/moeda');
-const Dominancia = require('./routes/dominancia');
+const Fiat         = require('./routes/fiat');
+const Etf          = require('./routes/etf');
+const Moeda        = require('./routes/moeda');
+const Dominancia   = require('./routes/dominancia');
 const MedoGanancia = require('./routes/medoganancia');
-const Post = require('./routes/post');
+const Post         = require('./routes/post');
 
 const controllerFiat         = require('./controllers/fiat');
 const controllerEtf          = require('./controllers/etf');
@@ -19,17 +19,9 @@ const controllerMedoGanancia = require('./controllers/medoganancia');
 const app = express();
 
 if (process.env.ENV_TYPE == 2) {
-    console.log('Inicou como produção.');
+    console.log('🌎 Inicou como produção.');
     
-    app.use(corsConfig.corsProd())
-} else {
-    console.log('Inicou como desenvolvimento.');
-
-    app.use(corsConfig.corsDev());
-}
-
-if (process.env.ENV_TYPE == 2) {
-    console.log('👍 Iniciando agendamentos.');
+    app.use(corsConfig.corsProd());
 
     // Todo dia à 3:10 da manhã são atualizados os dados de dominância
     cron.schedule('10 3 * * *', () => {
@@ -63,7 +55,9 @@ if (process.env.ENV_TYPE == 2) {
         controllerFiat.atualizarCotacoesFiat();
     });
 } else {
-    console.log('👎 Agendamentos desligados.')
+    console.log('💻 Inicou como desenvolvimento.');
+
+    app.use(corsConfig.corsDev());
 }
 
 app.use(Fiat);
@@ -74,5 +68,5 @@ app.use(MedoGanancia);
 app.use(Post);
 
 app.listen(process.env.PORT, () => {
-    console.log("Servidor iniciado com sucesso - ", process.env.NODE_ENV);
+    console.log("Servidor iniciado com sucesso");
 });
