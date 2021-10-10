@@ -33,4 +33,4 @@ app.use(Post);
 
 app.listen(process.env.PORT, () => {
     console.log("Servidor iniciado com sucesso");
-});
+})
