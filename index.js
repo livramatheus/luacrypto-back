@@ -31,6 +31,8 @@ app.use(Dominancia);
 app.use(MedoGanancia);
 app.use(Post);
 
+console.log('teste');
+
 app.listen(process.env.PORT, () => {
     console.log("Servidor iniciado com sucesso");
 })
