@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cron = require('node-cron');
+const corsConfig = require('./config/cors');
 
 const Fiat = require('./routes/fiat');
 const Etf = require('./routes/etf');
@@ -16,18 +17,15 @@ const controllerMoeda        = require('./controllers/moeda');
 const controllerMedoGanancia = require('./controllers/medoganancia');
 
 const app = express();
-const cors = require('cors');
-
-app.use(
-    cors({
-        origin: ['https://luacrypto.netlify.app', 'https://www.luacrypto.com']
-    })
-)
 
 if (process.env.ENV_TYPE == 2) {
     console.log('Inicou como produção.');
+    
+    app.use(corsConfig.corsProd())
 } else {
     console.log('Inicou como desenvolvimento.');
+
+    app.use(corsConfig.corsDev());
 }
 
 if (process.env.ENV_TYPE == 2) {
