@@ -140,6 +140,38 @@ const getMoedasDestaque = () => {
     })
 }
 
+const getDadosLista = () => {
+    const dadosGerais = new Promise((resolve, reject) => {
+        modelMoeda.getDadosGeraisParaLista().then((resultado) => {
+            resolve(resultado);
+        });
+    });
+
+    const dadosCotacoes = new Promise((resolve, reject) => {
+        modelMoeda.getCotacoesDiariaParaLista().then((resultado) => {
+            resolve(resultado);
+        });
+    });
+
+    return new Promise((resolve, reject) => {
+        Promise.all([dadosGerais, dadosCotacoes]).then((resultado) => {
+            
+            resolve(trataDadosLista(resultado));
+        });
+    })
+}
+
+const trataDadosLista = (dados) => {
+    dados[0].forEach((elm, idx, arr) => {
+        arr[idx].cotacoes = dados[1].filter((ctc) => {
+            return elm.chave === ctc.moeda;
+        })
+    });
+
+    return dados[0];
+
+}
+
 module.exports = {
     atualizarCotacoesMoeda,
     atualizarDadosMercadoMoeda,
@@ -150,5 +182,6 @@ module.exports = {
     getUltimaCotacaoBanco,
     getUltimaCotacaoBancoReduzida,
     pesquisarMoeda,
-    getMoedasDestaque
+    getMoedasDestaque,
+    getDadosLista
 }

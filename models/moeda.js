@@ -449,6 +449,97 @@ function getCotacaoDiaria(chave) {
 
 }
 
+function getDadosGeraisParaLista() {
+    let select = `SELECT
+                    moeda.chave,
+                    moeda.simbolo,
+                    moeda.nome,
+                    cotacao_moeda.preco_atual,
+                    cotacao_moeda.capitalizacao,
+                    (
+                    (
+                        cotacao_moeda.preco_atual - (
+                        SELECT
+                            preco_atual
+                        FROM
+                            cotacao_moeda x
+                        WHERE
+                            x.data_hora >= (
+                            SELECT
+                                DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                            )
+                            AND x.moeda = moeda.chave
+                        GROUP BY
+                            x.moeda
+                        )
+                    ) / cotacao_moeda.preco_atual * 100
+                    ) variacao_24h
+                FROM
+                    moeda
+                    JOIN cotacao_moeda ON moeda.chave = cotacao_moeda.moeda
+                WHERE
+                    cotacao_moeda.data_hora = (
+                    SELECT
+                        MAX(ss.data_hora)
+                    FROM
+                        cotacao_moeda ss
+                    WHERE
+                        ss.moeda = moeda.chave
+                        AND ss.data_hora >= (
+                        SELECT
+                            DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                        )
+                    )
+                    AND moeda.ativo = true
+                GROUP BY
+                    moeda.chave
+                ORDER BY
+                    capitalizacao DESC;`;
+
+    return new Promise((resolve, reject) => {
+        db.query({
+            sql: select,
+            timeout: 10000
+        }, function (error, results, fields) {
+            if (error) {
+                console.log('❌ Erro ao resgatar dados gerais da lista ' + error.message);
+            }
+
+            resolve(results);
+        })
+    })
+}
+function getCotacoesDiariaParaLista() {
+    let select = `SELECT
+                    moeda,
+                    data_hora,
+                    preco_atual
+                FROM
+                    cotacao_moeda
+                WHERE
+                    data_hora > (NOW() - INTERVAL 1 DAY)
+                GROUP BY
+                    moeda,
+                    sec_to_time(
+                    time_to_sec(data_hora) - time_to_sec(data_hora) % (120 * 60)
+                    )
+                ORDER BY
+                    moeda ASC;`;
+
+    return new Promise((resolve, reject) => {
+        db.query({
+            sql: select,
+            timeout: 10000
+        }, function (error, results, fields) {
+            if (error) {
+                console.log('❌ Erro ao resgatar cotações para a lista ' + error.message);
+            }
+
+            resolve(results);
+        })
+    })
+}
+
 module.exports = {
     insereCotacaoBanco,
     getUltimaCotacaoBanco,
@@ -461,5 +552,7 @@ module.exports = {
     pesquisarMoeda,
     insereDadosMercadoMoeda,
     getMoedasAtivas,
-    getMoedasDestaque
+    getMoedasDestaque,
+    getDadosGeraisParaLista,
+    getCotacoesDiariaParaLista
 };

@@ -20,7 +20,7 @@ if (process.env.ENV_TYPE == 2) {
     app.use(corsConfig.corsProd());
 } else {
     console.log('💻 Inicou como desenvolvimento.');
-
+    
     app.use(corsConfig.corsDev());
 }
 

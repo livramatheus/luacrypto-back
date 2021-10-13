@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const controllerEtf = require('../controllers/etf');
+const redisClient = require('../config/redis');
 
 /**
  * Retorna dados gerais e a última cotação da ETF passada como parâmetro na URL
@@ -8,12 +9,27 @@ const controllerEtf = require('../controllers/etf');
  * Devolve: tudo sobre uma ETF, desde seus dados básicos até os números mais 
  * recentes de trading
  */
-router.get('/etf/:simbolo', (req, res) => {
+router.get('/etf/:simbolo', async (req, res) => {
     let simbolo = req.params.simbolo;
 
-    controllerEtf.getDadosGeraisRecentes(simbolo).then((resultadoPromise) => {
-        res.send(resultadoPromise);
+    const CACHE_SECONDS = 300; // 5 minutos / 300 segundos
+    const CACHE_NAME    = `etf_simbolo_${simbolo}`;
+
+    const respostaCache = await redisClient.getCache(CACHE_NAME).then((dadosCache) => {
+        return dadosCache;
     });
+
+    if (respostaCache) {
+        res.send(respostaCache);
+    } else {
+        controllerEtf.getDadosGeraisRecentes(simbolo).then((resultadoBanco) => {
+            redisClient.setCache(CACHE_NAME, JSON.stringify(resultadoBanco), CACHE_SECONDS).then((resultadoRedis) => {
+                if (resultadoRedis) {
+                    res.send(resultadoBanco);
+                }
+            })
+        });
+    }
 });
 
 /**
@@ -23,46 +39,121 @@ router.get('/etf/:simbolo', (req, res) => {
  * 
  * Devolve: simbolo, nome, baixa, alta, abertura, volume e cotação atual
  */
-router.get('/todasetfsreduzidas', (req, res) => {
-    controllerEtf.getTodasReduzidas().then((resultadoPromise) => {
-        res.send(resultadoPromise);
+router.get('/todasetfsreduzidas', async (req, res) => {
+    const CACHE_SECONDS = 3600; // 1 hora / 3600 segundos
+    const CACHE_NAME    = `etf_reduzida`;
+
+    const respostaCache = await redisClient.getCache(CACHE_NAME).then((dadosCache) => {
+        return dadosCache;
     });
+
+    if (respostaCache) {
+        res.send(respostaCache);
+    } else {
+        controllerEtf.getTodasReduzidas().then((resultadoBanco) => {
+            redisClient.setCache(CACHE_NAME, JSON.stringify(resultadoBanco), CACHE_SECONDS).then((resultadoRedis) => {
+                if (resultadoRedis) {
+                    res.send(resultadoBanco);
+                }
+            })
+        });
+    }
 });
 
-// Cotação Diária
-router.get('/etfdiaria/:simbolo', (req, res) => {
+// Cotação Diaria
+router.get('/etfdiaria/:simbolo', async (req, res) => {
     let simbolo = req.params.simbolo;
 
-    controllerEtf.getDadosDiario(simbolo).then((resultado) => {
-        res.send(resultado);
-    });
+    const CACHE_SECONDS = 3600; // 1 hora / 3600 segundos
+    const CACHE_NAME    = `etf_diaria_chave_${simbolo}`;
+
+    const respostaCache = await redisClient.getCache(CACHE_NAME).then((dadosCache) => {
+        return dadosCache;
+    })
+
+    if (respostaCache) {
+        res.send(respostaCache);
+    } else {
+        controllerEtf.getDadosDiario(simbolo).then((resultadoBanco) => {
+            redisClient.setCache(CACHE_NAME, JSON.stringify(resultadoBanco), CACHE_SECONDS).then((resultadoRedis) => {
+                if (resultadoRedis) {
+                    res.send(resultadoBanco);
+                }
+            })
+        });   
+    }
 });
 
 // Cotação Semanal
-router.get('/etfsemanal/:simbolo', (req, res) => {
+router.get('/etfsemanal/:simbolo', async (req, res) => {
     let simbolo = req.params.simbolo;
 
-    controllerEtf.getDadosSemanal(simbolo).then((resultado) => {
-        res.send(resultado);
-    });
+    const CACHE_SECONDS = 3600; // 1 hora / 3600 segundos
+    const CACHE_NAME    = `etf_semanal_chave_${simbolo}`;
+
+    const respostaCache = await redisClient.getCache(CACHE_NAME).then((dadosCache) => {
+        return dadosCache;
+    })
+
+    if (respostaCache) {
+        res.send(respostaCache);
+    } else {
+        controllerEtf.getDadosSemanal(simbolo).then((resultadoBanco) => {
+            redisClient.setCache(CACHE_NAME, JSON.stringify(resultadoBanco), CACHE_SECONDS).then((resultadoRedis) => {
+                if (resultadoRedis) {
+                    res.send(resultadoBanco);
+                }
+            })
+        });   
+    }
 });
 
 // Cotação Mensal
-router.get('/etfmensal/:simbolo', (req, res) => {
+router.get('/etfmensal/:simbolo', async (req, res) => {
     let simbolo = req.params.simbolo;
 
-    controllerEtf.getDadosMensal(simbolo).then((resultado) => {
-        res.send(resultado);
-    });
+    const CACHE_SECONDS = 3600; // 1 hora / 3600 segundos
+    const CACHE_NAME    = `etf_mensal_chave_${simbolo}`;
+
+    const respostaCache = await redisClient.getCache(CACHE_NAME).then((dadosCache) => {
+        return dadosCache;
+    })
+
+    if (respostaCache) {
+        res.send(respostaCache);
+    } else {
+        controllerEtf.getDadosMensal(simbolo).then((resultadoBanco) => {
+            redisClient.setCache(CACHE_NAME, JSON.stringify(resultadoBanco), CACHE_SECONDS).then((resultadoRedis) => {
+                if (resultadoRedis) {
+                    res.send(resultadoBanco);
+                }
+            })
+        });   
+    }
 });
 
 // Cotação Anual
-router.get('/etfanual/:simbolo', (req, res) => {
+router.get('/etfanual/:simbolo', async (req, res) => {
     let simbolo = req.params.simbolo;
 
-    controllerEtf.getDadosAnual(simbolo).then((resultado) => {
-        res.send(resultado);
-    });
+    const CACHE_SECONDS = 3600; // 1 hora / 3600 segundos
+    const CACHE_NAME    = `etf_anual_chave_${simbolo}`;
+
+    const respostaCache = await redisClient.getCache(CACHE_NAME).then((dadosCache) => {
+        return dadosCache;
+    })
+
+    if (respostaCache) {
+        res.send(respostaCache);
+    } else {
+        controllerEtf.getDadosAnual(simbolo).then((resultadoBanco) => {
+            redisClient.setCache(CACHE_NAME, JSON.stringify(resultadoBanco), CACHE_SECONDS).then((resultadoRedis) => {
+                if (resultadoRedis) {
+                    res.send(resultadoBanco);
+                }
+            })
+        });   
+    }
 });
 
 module.exports = router;
