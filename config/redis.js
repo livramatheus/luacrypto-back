@@ -1,5 +1,15 @@
 const redis       = require('redis');
-const redisClient = new redis.createClient();
+var redisClient;
+
+if (process.env.REDIS_TLS_URL) {
+    redisClient = redis.createClient(process.env.REDIS_TLS_URL, {
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+} else {
+    redisClient = redis.createClient();   
+}
 
 const getCache = (key) => {
     return new Promise((resolve, reject) => {
