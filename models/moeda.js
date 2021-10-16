@@ -524,7 +524,8 @@ function getCotacoesDiariaParaLista() {
                     time_to_sec(data_hora) - time_to_sec(data_hora) % (120 * 60)
                     )
                 ORDER BY
-                    moeda ASC;`;
+                    moeda ASC,
+                    data_hora ASC;`;
 
     return new Promise((resolve, reject) => {
         db.query({
