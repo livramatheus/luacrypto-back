@@ -27,12 +27,10 @@ router.get('/todasfiatscompletas', async (req, res) => {
 
     if (respostaCache) {
         res.send(respostaCache);
-        console.log('cachea')
     } else {
         controllerFiat.getAllCompletos().then((resultadoBanco) => {
             redisClient.setCache(CACHE_NAME, JSON.stringify(resultadoBanco), CACHE_SECONDS).then((resultadoRedis) => {
                 if (resultadoRedis) {
-                    console.log('bancob')
                     res.send(resultadoBanco);
                 }
             });

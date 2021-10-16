@@ -116,8 +116,6 @@ router.get('/moeda/:chave', async (req, res) => {
         return dadosCache;
     })
 
-    console.log(respostaCache)
-
     if (respostaCache) {
         res.send(respostaCache);
     } else {
