@@ -215,10 +215,12 @@ router.get('/dadoslista', async (req, res) => {
                 if (resultadoRedis) {
                     res.send(resultadoBanco);
                 }
+            }).catch((error) => {
+                console.log('Error on /dadoslista! ', error);
+                res.status(503).send();
             })
         });
     }
-
 });
 
 module.exports = router;
