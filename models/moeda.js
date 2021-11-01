@@ -503,6 +503,7 @@ function getDadosGeraisParaLista() {
         }, function (error, results, fields) {
             if (error) {
                 console.log('❌ Erro ao resgatar dados gerais da lista ' + error.message);
+                throw error;
             }
 
             resolve(results);

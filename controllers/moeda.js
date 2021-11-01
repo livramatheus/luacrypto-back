@@ -144,6 +144,8 @@ const getDadosLista = () => {
     const dadosGerais = new Promise((resolve, reject) => {
         modelMoeda.getDadosGeraisParaLista().then((resultado) => {
             resolve(resultado);
+        }).catch((error) => {
+            reject(error.message);
         });
     });
 
