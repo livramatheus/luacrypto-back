@@ -14,12 +14,12 @@ const tasks      = require('./tasks/tasks');
 const app = express();
 
 if (process.env.ENV_TYPE == 2) {
-    console.log('🌎 Inicou como produção.');
+    console.log('🌎 Server started as production.');
     
     tasks.iniciaAgendamentos();
     app.use(corsConfig.corsProd());
 } else {
-    console.log('💻 Inicou como desenvolvimento.');
+    console.log('💻 Server started as development.');
     
     app.use(corsConfig.corsDev());
 }
@@ -34,5 +34,5 @@ app.use(Post);
 console.log('teste');
 
 app.listen(process.env.PORT, () => {
-    console.log("Servidor iniciado com sucesso");
+    console.log("Server started successfully");
 })
