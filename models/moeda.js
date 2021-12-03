@@ -494,7 +494,8 @@ function getDadosGeraisParaLista() {
                 GROUP BY
                     moeda.chave
                 ORDER BY
-                    capitalizacao DESC;`;
+                    capitalizacao DESC
+                LIMIT 15;`;
 
     return new Promise((resolve, reject) => {
         db.query({
